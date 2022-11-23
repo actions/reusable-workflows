@@ -1,0 +1,56 @@
+# This workflow helps us to analize repository code for vulnerabilities, bugs, and other errors using CodeQL. 
+# For that we're using CodeQL Action: https://github.com/github/codeql-action
+# Learn more about CodeQL at https://codeql.github.com/
+
+name: CodeQL
+
+on:
+  workflow_call:
+    inputs:
+      languages:
+        description: "Optional input to set languages for CodeQL check. Supported values are: 'cpp', 'csharp', 'go', 'java', 'javascript', 'typescript', 'python', 'ruby'. To use multiple languages use the same syntax as used in the default value."
+        required: false
+        type: string
+        default: "['javascript']"
+      build-command:
+        description: "Optional input to specify manual build command. Multiline syntax is supported"
+        required: false
+        type: string
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ${{fromJson(inputs.languages)}}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # Initializes the CodeQL tools for scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+
+    # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
+    # If this step fails, configure a build command manually using build-command input. This command will be executed in the corresponding step.
+    - name: Autobuild
+      if: ${{!inputs.build-command}}
+      uses: github/codeql-action/autobuild@v2
+
+    - name: Manual build
+      if: ${{inputs.build-command}}
+      run: |
+        ${{inputs.build-command}}
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
