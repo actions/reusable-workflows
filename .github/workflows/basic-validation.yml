@@ -1,10 +1,10 @@
-# This workflow helps us to be sure that the code of the action we're going to deploy:
+# This workflow helps to be sure that the code of the action we're going to deploy:
 # 1. Is well-formated
 # 2. Is linted
 # 3. Successfully builds
 # 4. Passes unit-tests
 # Additionally node packages used by the action can be audited.
-name: CI
+name: Basic validation
 
 on:
   workflow_call:
@@ -19,23 +19,23 @@ on:
         required: false
         type: string
         default: "npm run build"
-      enable-prettier:
-        description: "Optional input to enable prettiering process"
+      prettier-command:
+        description: "Optional input to set prettier command. Set to an empty string if prettier isn't needed"
         required: false
-        type: boolean
-        default: true
-      enable-linter:
-        description: "Optional input to enable linting process"
+        type: string
+        default: "npm run format-check"
+      linter-command:
+        description: "Optional input to set linter command. Set to an empty string if linting isn't needed"
         required: false
-        type: boolean
-        default: true
+        type: string
+        default: "npm run lint"
       enable-audit:
         description: "Optional input to enable npm package audit process"
         required: false
         type: boolean
         default: true
       node-version:
-        description: "Optional input to set version of node.js. The input syntax corresponds to the setup-node's one."
+        description: "Optional input to set version of Node.js used to build a project. The input syntax corresponds to the setup-node's one"
         required: false
         type: string
         default: "16.x"
@@ -66,19 +66,19 @@ jobs:
       run: npm ci --ignore-scripts
       
     - name: Run prettier
-      if: ${{inputs.enable-prettier}}
-      run: npm run format-check
+      if: ${{inputs.prettier-command}}
+      run: ${{inputs.prettier-command}}
 
     - name: Run linter
-      if: ${{inputs.enable-linter}}
-      run: npm run lint
+      if: ${{inputs.linter-command}}
+      run: ${{inputs.linter-command}}
 
     - name: Build
       if: ${{inputs.build-command}}
       run: ${{inputs.build-command}}
 
     - name: Test
-      run: npm run test
+      run: npm test
 
     - name: Audit packages
       run: npm audit --audit-level=high

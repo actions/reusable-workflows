@@ -1,4 +1,4 @@
-# This workflow helps us to check statuses of cached dependencies which we use in the action with help of the Licensed tool.
+# This workflow helps to check statuses of cached dependencies used in the action with help of the Licensed tool.
 # Learn more about Licensed at https://github.com/github/licensed
 
 name: Licensed
