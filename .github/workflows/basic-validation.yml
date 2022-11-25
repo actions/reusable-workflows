@@ -20,7 +20,7 @@ on:
         type: string
         default: "npm run build"
       prettier-command:
-        description: "Optional input to set prettier command. Set to an empty string if prettier isn't needed"
+        description: "Optional input to set prettier command. Set to an empty string if prettiering isn't needed"
         required: false
         type: string
         default: "npm run format-check"
