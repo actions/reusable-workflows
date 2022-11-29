@@ -4,6 +4,7 @@
 # 3. Successfully builds
 # 4. Passes unit-tests
 # Additionally node packages used by the action can be audited.
+
 name: Basic validation
 
 on:
