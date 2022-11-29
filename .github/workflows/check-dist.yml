@@ -22,7 +22,6 @@ on:
         required: false
         type: string
         default: "npm"
-      
 
 jobs:
   check-dist:

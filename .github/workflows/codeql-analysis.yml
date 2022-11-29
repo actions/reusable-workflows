@@ -8,7 +8,7 @@ on:
   workflow_call:
     inputs:
       codeql-cfg-path:
-        description: "Optional input to set path to the CodeQL config file"
+        description: "Optional input to set path to a CodeQL config file"
         required: false
         type: string
       build-command:
@@ -39,8 +39,6 @@ jobs:
       uses: github/codeql-action/init@v2
       with:
         config-file: ${{inputs.codeql-cfg-path}}
-      
-  
 
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, configure a build command manually using build-command input. This command will be executed in the corresponding step.
