@@ -14,21 +14,6 @@ on:
         required: false
         type: string
         default: "['ubuntu-latest', 'windows-latest', 'macos-latest']"
-      build-command:
-        description: "Optional input to configure build command in case the default one doesn't suit. Set to an empty string if build isn't needed. Multiline syntax is supported"
-        required: false
-        type: string
-        default: "npm run build"
-      prettier-command:
-        description: "Optional input to set prettier command. Set to an empty string if prettiering isn't needed"
-        required: false
-        type: string
-        default: "npm run format-check"
-      linter-command:
-        description: "Optional input to set linter command. Set to an empty string if linting isn't needed"
-        required: false
-        type: string
-        default: "npm run lint"
       enable-audit:
         description: "Optional input to enable npm package audit process"
         required: false
@@ -66,16 +51,13 @@ jobs:
       run: npm ci --ignore-scripts
       
     - name: Run prettier
-      if: ${{inputs.prettier-command}}
-      run: ${{inputs.prettier-command}}
+      run: npm run format-check
 
     - name: Run linter
-      if: ${{inputs.linter-command}}
-      run: ${{inputs.linter-command}}
+      run: npm run lint
 
     - name: Build
-      if: ${{inputs.build-command}}
-      run: ${{inputs.build-command}}
+      run: npm run build
 
     - name: Test
       run: npm test

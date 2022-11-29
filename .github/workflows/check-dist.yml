@@ -12,11 +12,6 @@ on:
         required: false
         type: string
         default: "./dist"
-      build-command:
-        description: "Optional input to configure build command in case the default one doesn't suit. If it's not set, defaults to 'npm run build'"
-        required: false
-        type: string
-        default: "npm run build"
       node-version:
         description: "Optional input to set version of Node.js used to build a project. The input syntax corresponds to the setup-node's one"
         required: false
@@ -47,7 +42,7 @@ jobs:
         run: npm ci --ignore-scripts
 
       - name: Rebuild the dist directory
-        run: ${{inputs.build-command}}
+        run: npm run build
 
       - name: Compare the expected and actual dist directories
         run: |
