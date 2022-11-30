@@ -20,7 +20,7 @@ jobs:
 
       - name: Install licensed tool
         run: |
-          cd $RUNNER_TEMP
+          cd "$RUNNER_TEMP"
           curl -Lfs -o licensed.tar.gz https://github.com/github/licensed/releases/download/3.9.0/licensed-3.9.0-linux-x64.tar.gz 
           sudo tar -xzf licensed.tar.gz
           sudo mv licensed /usr/local/bin/licensed
