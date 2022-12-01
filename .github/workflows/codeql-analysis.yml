@@ -7,6 +7,11 @@ name: CodeQL
 on:
   workflow_call:
     inputs:
+      languages:
+        description: "Optional input to set languages for CodeQL check. Supported values are: 'cpp', 'csharp', 'go', 'java', 'javascript', 'typescript', 'python', 'ruby'. To use multiple languages use the same syntax as used in the default value."
+        required: false
+        type: string
+        default: "['javascript']"
       codeql-cfg-path:
         description: "Optional input to set path to a CodeQL config file"
         required: false
@@ -25,20 +30,21 @@ jobs:
       contents: read
       security-events: write
 
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ${{fromJson(inputs.languages)}}
+
     steps:
     - name: Checkout
       uses: actions/checkout@v3
 
     # Initializes the CodeQL tools for scanning.
-    - name: Initialize CodeQL
-      if: ${{!inputs.codeql-cfg-path}}
-      uses: github/codeql-action/init@v2
-
     - name: Initialize CodeQL with config file
-      if: ${{inputs.codeql-cfg-path}}
       uses: github/codeql-action/init@v2
       with:
         config-file: ${{inputs.codeql-cfg-path}}
+        languages: ${{matrix.language}}
 
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, configure a build command manually using build-command input. This command will be executed in the corresponding step.
