@@ -1,0 +1,61 @@
+# This workflow helps to analyze repository code for vulnerabilities, bugs, and other errors using CodeQL. 
+# For that CodeQL Action is used: https://github.com/github/codeql-action
+# Learn more about CodeQL at https://codeql.github.com/
+
+name: CodeQL
+
+on:
+  workflow_call:
+    inputs:
+      languages:
+        description: "Optional input to set languages for CodeQL check. Supported values are: 'cpp', 'csharp', 'go', 'java', 'javascript', 'typescript', 'python', 'ruby'. To set multiple languages, use the same syntax as you can see in the default value."
+        required: false
+        type: string
+        default: "['javascript']"
+      codeql-cfg-path:
+        description: "Optional input to set path to a CodeQL config file"
+        required: false
+        type: string
+      build-command:
+        description: "Optional input to specify manual build command. The multiline syntax is supported"
+        required: false
+        type: string
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ${{fromJson(inputs.languages)}}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # Initializes the CodeQL tools for scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{matrix.language}}
+        config-file: ${{inputs.codeql-cfg-path}}
+
+    # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
+    # If this step fails, configure a build command manually using build-command input. This command will be executed in the corresponding step.
+    - name: Autobuild
+      if: ${{!inputs.build-command}}
+      uses: github/codeql-action/autobuild@v2
+
+    - name: Manual build
+      if: ${{inputs.build-command}}
+      run: |
+        ${{inputs.build-command}}
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2

@@ -1,0 +1,61 @@
+# This workflow helps ensure that generated innards of `dist` directory match what we expect them to be.
+# The `dist` is a particular directory in Actions that contains distributable JS files.
+# In Actions, the `dist` is generated through a build process from other source files.
+
+name: Check dist
+
+on:
+  workflow_call:
+    inputs:
+      dist-path:
+        description: "Optional input to set a path to the dist folder. If it's not set, it defaults to './dist'"
+        required: false
+        type: string
+        default: "./dist"
+      node-version:
+        description: "Optional input to set the version of Node.js used to build a project. The input syntax corresponds to the setup-node's one"
+        required: false
+        type: string
+        default: "16.x"
+      node-caching:
+        description: "Optional input to set up caching for the setup-node action. The input syntax corresponds to the setup-node's one. Set to an empty string if caching isn't needed"
+        required: false
+        type: string
+        default: "npm"
+
+jobs:
+  check-dist:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js ${{inputs.node-version}}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{inputs.node-version}}
+          cache: ${{inputs.node-caching}}
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Rebuild the dist directory
+        run: npm run build
+
+      - name: Compare the expected and actual dist directories
+        run: |
+          if [ "$(git diff --ignore-space-at-eol ${{inputs.folder-path}} | wc -l)" -gt "0" ]; then
+            echo "Detected uncommitted changes after the build. See the status below:"
+            git diff
+            exit 1
+          fi
+        id: diff
+
+      # If inners of the dist directory were different than expected, upload the expected version as an artifact
+      - name: Upload artifact
+        if: ${{failure() && steps.diff.conclusion == 'failure'}}
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: ${{inputs.dist-path}}

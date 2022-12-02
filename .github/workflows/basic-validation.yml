@@ -1,0 +1,68 @@
+# This workflow helps ensure that the code of the action we're going to deploy:
+# 1. Is well-formated
+# 2. Is linted
+# 3. Successfully builds
+# 4. Passes unit-tests
+# Additionally node packages used by the action can be audited.
+
+name: Basic validation
+
+on:
+  workflow_call:
+    inputs:
+      operating-systems:
+        description: "Optional input to set a list of operating systems which the workflow uses. Defaults to ['ubuntu-latest', 'windows-latest', 'macos-latest'] if not set"
+        required: false
+        type: string
+        default: "['ubuntu-latest', 'windows-latest', 'macos-latest']"
+      enable-audit:
+        description: "Optional input to enable npm package audit process"
+        required: false
+        type: boolean
+        default: true
+      node-version:
+        description: "Optional input to set the version of Node.js used to build the project. The input syntax corresponds to the setup-node's one"
+        required: false
+        type: string
+        default: "16.x"
+      node-caching:
+        description: "Optional input to set up caching for the setup-node action. The input syntax corresponds to the setup-node's one. Set to an empty string if caching isn't needed"
+        required: false
+        type: string
+        default: "npm"
+
+jobs:
+  build:
+    runs-on: ${{matrix.operating-systems}}
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-systems: ${{fromJson(inputs.operating-systems)}}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js ${{inputs.node-version}}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{inputs.node-version}}
+        cache: ${{inputs.node-caching}}
+
+    - name: Install dependencies
+      run: npm ci --ignore-scripts
+      
+    - name: Run prettier
+      run: npm run format-check
+
+    - name: Run linter
+      run: npm run lint
+
+    - name: Build
+      run: npm run build
+
+    - name: Test
+      run: npm test
+
+    - name: Audit packages
+      run: npm audit --audit-level=high
+      if: ${{inputs.enable-audit}}
