@@ -1,4 +1,4 @@
-# This workflow helps to be sure that the code of the action we're going to deploy:
+# This workflow helps ensure that the code of the action we're going to deploy:
 # 1. Is well-formated
 # 2. Is linted
 # 3. Successfully builds
@@ -11,7 +11,7 @@ on:
   workflow_call:
     inputs:
       operating-systems:
-        description: "Optional input to set list of operating systems whick the workflow uses. Defaults to ['ubuntu-latest', 'windows-latest', 'macos-latest'] if not set"
+        description: "Optional input to set a list of operating systems which the workflow uses. Defaults to ['ubuntu-latest', 'windows-latest', 'macos-latest'] if not set"
         required: false
         type: string
         default: "['ubuntu-latest', 'windows-latest', 'macos-latest']"
@@ -21,7 +21,7 @@ on:
         type: boolean
         default: true
       node-version:
-        description: "Optional input to set version of Node.js used to build a project. The input syntax corresponds to the setup-node's one"
+        description: "Optional input to set the version of Node.js used to build the project. The input syntax corresponds to the setup-node's one"
         required: false
         type: string
         default: "16.x"

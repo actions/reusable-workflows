@@ -1,4 +1,4 @@
-# This workflow helps to analize repository code for vulnerabilities, bugs, and other errors using CodeQL. 
+# This workflow helps to analyze repository code for vulnerabilities, bugs, and other errors using CodeQL. 
 # For that CodeQL Action is used: https://github.com/github/codeql-action
 # Learn more about CodeQL at https://codeql.github.com/
 
@@ -8,7 +8,7 @@ on:
   workflow_call:
     inputs:
       languages:
-        description: "Optional input to set languages for CodeQL check. Supported values are: 'cpp', 'csharp', 'go', 'java', 'javascript', 'typescript', 'python', 'ruby'. To use multiple languages use the same syntax as used in the default value."
+        description: "Optional input to set languages for CodeQL check. Supported values are: 'cpp', 'csharp', 'go', 'java', 'javascript', 'typescript', 'python', 'ruby'. To set multiple languages, use the same syntax as you can see in the default value."
         required: false
         type: string
         default: "['javascript']"
@@ -17,7 +17,7 @@ on:
         required: false
         type: string
       build-command:
-        description: "Optional input to specify manual build command. Multiline syntax is supported"
+        description: "Optional input to specify manual build command. The multiline syntax is supported"
         required: false
         type: string
 

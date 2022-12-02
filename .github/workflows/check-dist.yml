@@ -1,5 +1,5 @@
-# This workflow helps to be sure that generated innards of `dist` directory actually match what we expect them to be.
-# The `dist` is a special directory in Actions which contains distributable JS files.
+# This workflow helps ensure that generated innards of `dist` directory match what we expect them to be.
+# The `dist` is a particular directory in Actions that contains distributable JS files.
 # In Actions, the `dist` is generated through a build process from other source files.
 
 name: Check dist
@@ -8,12 +8,12 @@ on:
   workflow_call:
     inputs:
       dist-path:
-        description: "Optional input to set a path to the dist folder. If it's not set, defaults to './dist'"
+        description: "Optional input to set a path to the dist folder. If it's not set, it defaults to './dist'"
         required: false
         type: string
         default: "./dist"
       node-version:
-        description: "Optional input to set version of Node.js used to build a project. The input syntax corresponds to the setup-node's one"
+        description: "Optional input to set the version of Node.js used to build a project. The input syntax corresponds to the setup-node's one"
         required: false
         type: string
         default: "16.x"
