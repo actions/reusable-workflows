@@ -2,7 +2,7 @@
 
 This repository contains [reusable workflows](https://docs.github.com/en/actions/using-workflows/reusing-workflows) that are useful for developing actions.
 
-# Available reusable workflows
+## Available reusable workflows
 
 - [`basic-validation.yml`](./.github/workflows/basic-validation.yml)
 
@@ -51,7 +51,7 @@ Default use pattern:
 licensed-call:
   uses: actions/reusable-workflows/.github/workflows/licensed.yml@main
 ```
-# Adjusting reusable workflows
+## Adjusting reusable workflows
 
 If the default behaviour of a reusable workflow isn't what you need, you can adjust it using the workflow's inputs.
 Check the available inputs of reusable workflows in the corresponding YAML file in `.github/workflows/<reusable-workflow-name>.yml`.
