@@ -63,3 +63,10 @@ basic-validation-call:
   with:
     enable-audit: false
 ```
+## License
+
+The scripts and documentation in this project are released under the [MIT License](LICENSE.txt)
+
+## Contributions
+
+Contributions are welcome! See [Contributor's Guide](CONTRIBUTING.md)
