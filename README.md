@@ -14,7 +14,7 @@ This workflow helps ensure that the code of the action you are going to deploy:
 Additionally node packages used by the action can be audited.
 
 **Default use pattern:**
-```
+```yaml
 basic-validation-call:
   uses: actions/reusable-workflows/.github/workflows/basic-validation.yml@main
 ```
@@ -26,7 +26,7 @@ The `dist` is a particular directory in Actions that contains distributable JS f
 In Actions, the `dist` is generated through a build process from other source files.
 
 **Default use pattern:**
-```
+```yaml
 check-dist-call:
   uses: actions/reusable-workflows/.github/workflows/check-dist.yml@main
 ```
@@ -37,7 +37,7 @@ This workflow helps to analyze repository code for vulnerabilities, bugs, and ot
 For that CodeQL Action is used: https://github.com/github/codeql-action
 
 **Default use pattern:**
-```
+```yaml
 codeql-analysis-call:
   uses: actions/reusable-workflows/.github/workflows/codeql-analysis.yml@main
 ```
@@ -47,7 +47,7 @@ codeql-analysis-call:
 This workflow helps to check the statuses of cached dependencies used in action with the help of the Licensed tool.
 
 **Default use pattern:**
-```
+```yaml
 licensed-call:
   uses: actions/reusable-workflows/.github/workflows/licensed.yml@main
 ```
@@ -57,7 +57,7 @@ If the default behaviour of a reusable workflow isn't what you need, you can adj
 Check the available inputs of reusable workflows in the corresponding YAML file in `.github/workflows/<reusable-workflow-name>.yml`.
 
 Example of disabling audit of npm packages in the `basic-validation` workflow:
-```
+```yaml
 basic-validation-call:
   uses: actions/reusable-workflows/.github/workflows/basic-validation.yml@main
   with:
