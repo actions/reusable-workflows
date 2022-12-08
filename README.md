@@ -21,7 +21,7 @@ basic-validation-call:
 
 - [`check-dist.yml`](./.github/workflows/check-dist.yml)
 
-This workflow helps ensure that generated innards of `dist` directory match what they are expected to be.
+This workflow helps ensure that the generated innards of the `dist` directory match what they are expected to be.
 The `dist` is a particular directory in Actions that contains distributable JS files.
 In Actions, the `dist` is generated through a build process from other source files.
 
