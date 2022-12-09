@@ -33,7 +33,7 @@ check-dist-call:
 
 - [`codeql-analysis.yml`](./.github/workflows/codeql-analysis.yml)
 
-This workflow uses [GitHub's code scanning](https://docs.github.com/en/code-security/code-scanning feature) to analyze a repository for vulnerabilities, bugs, and other errors. 
+This workflow uses [GitHub's code scanning feature](https://docs.github.com/en/code-security/code-scanning) to analyze a repository for vulnerabilities, bugs, and other errors. 
 This workflow uses [github/codeql-action](https://github.com/github/codeql-action) to run code scanning.
 
 **Default use pattern:**
