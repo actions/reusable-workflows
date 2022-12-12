@@ -1,3 +1,72 @@
 # Reusable Workflows for Developing Actions
 
 This repository contains [reusable workflows](https://docs.github.com/en/actions/using-workflows/reusing-workflows) that are useful for developing actions.
+
+## Available workflows
+
+- [`basic-validation.yml`](./.github/workflows/basic-validation.yml)
+
+This workflow helps ensure that the code of the action you are going to deploy:
+1. Is well-formated
+2. Is linted
+3. Successfully builds
+4. Passes unit-tests
+Additionally node packages used by the action can be audited.
+
+**Default use pattern:**
+```yaml
+basic-validation-call:
+  uses: actions/reusable-workflows/.github/workflows/basic-validation.yml@main
+```
+
+- [`check-dist.yml`](./.github/workflows/check-dist.yml)
+
+This workflow helps ensure that the generated innards of the `dist` directory match what they are expected to be.
+The `dist` is a particular directory in Actions that contains distributable JS files.
+In Actions, the `dist` is generated through a build process from other source files.
+
+**Default use pattern:**
+```yaml
+check-dist-call:
+  uses: actions/reusable-workflows/.github/workflows/check-dist.yml@main
+```
+
+- [`codeql-analysis.yml`](./.github/workflows/codeql-analysis.yml)
+
+This workflow uses [GitHub's code scanning feature](https://docs.github.com/en/code-security/code-scanning) to analyze a repository for vulnerabilities, bugs, and other errors. 
+This workflow uses [github/codeql-action](https://github.com/github/codeql-action) to run code scanning.
+
+**Default use pattern:**
+```yaml
+codeql-analysis-call:
+  uses: actions/reusable-workflows/.github/workflows/codeql-analysis.yml@main
+```
+
+- [`licensed.yml`](./.github/workflows/licensed.yml)
+
+This workflow helps to check the statuses of cached dependencies used in action with the help of the Licensed tool.
+
+**Default use pattern:**
+```yaml
+licensed-call:
+  uses: actions/reusable-workflows/.github/workflows/licensed.yml@main
+```
+## Adjusting reusable workflows
+
+If the default behaviour of a reusable workflow isn't what you need, you can adjust it using the workflow's inputs.
+Check the available inputs of reusable workflows in the corresponding YAML file in `.github/workflows/<reusable-workflow-name>.yml`.
+
+Example of disabling audit of npm packages in the `basic-validation` workflow:
+```yaml
+basic-validation-call:
+  uses: actions/reusable-workflows/.github/workflows/basic-validation.yml@main
+  with:
+    enable-audit: false
+```
+## License
+
+The scripts and documentation in this project are released under the [MIT License](LICENSE.txt)
+
+## Contributions
+
+Contributions are welcome! See [Contributor's Guide](CONTRIBUTING.md)
