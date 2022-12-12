@@ -2,18 +2,18 @@
 
 This repository contains [reusable workflows](https://docs.github.com/en/actions/using-workflows/reusing-workflows) that are useful for developing actions.
 
+## Background
+
+These workflows are used for the development lifecycles of the GitHub-provided actions in the [github/actions](https://github.com/actions/) org.
+We also provide them here to use in actions that you create!
+
 ## Available workflows
 
 - [`basic-validation.yml`](./.github/workflows/basic-validation.yml)
 
-This workflow helps ensure that the code of the action you are going to deploy:
-1. Is well-formated
-2. Is linted
-3. Successfully builds
-4. Passes unit-tests
-Additionally node packages used by the action can be audited.
+This workflow **compiles** and **tests** the code in the repo. It also checks that it passes **linting** and **formatting** rules. Optionally, it can run `npm audit` on the packages in the repo.
 
-**Default use pattern:**
+**Usage**
 ```yaml
 basic-validation-call:
   uses: actions/reusable-workflows/.github/workflows/basic-validation.yml@main
@@ -21,11 +21,11 @@ basic-validation-call:
 
 - [`check-dist.yml`](./.github/workflows/check-dist.yml)
 
-This workflow helps ensure that the generated innards of the `dist` directory match what they are expected to be.
-The `dist` is a particular directory in Actions that contains distributable JS files.
-In Actions, the `dist` is generated through a build process from other source files.
+This workflow ensures that the generated contents of the `dist` directory match what they are expected to be.
+For actions that follow our [TypeScript](https://github.com/actions/typescript-action) or [JavaScript](https://github.com/actions/javascript-action) templates, `dist` contains the packaged script that is executed by the runner.
+Whenever you update the source code, the `dist` files must be regenerated for the changes to take effect.
 
-**Default use pattern:**
+**Usage**
 ```yaml
 check-dist-call:
   uses: actions/reusable-workflows/.github/workflows/check-dist.yml@main
@@ -36,7 +36,7 @@ check-dist-call:
 This workflow uses [GitHub's code scanning feature](https://docs.github.com/en/code-security/code-scanning) to analyze a repository for vulnerabilities, bugs, and other errors. 
 This workflow uses [github/codeql-action](https://github.com/github/codeql-action) to run code scanning.
 
-**Default use pattern:**
+**Usage**
 ```yaml
 codeql-analysis-call:
   uses: actions/reusable-workflows/.github/workflows/codeql-analysis.yml@main
@@ -46,7 +46,6 @@ codeql-analysis-call:
 
 This workflow helps to check the statuses of cached dependencies used in action with the help of the Licensed tool.
 
-**Default use pattern:**
 ```yaml
 licensed-call:
   uses: actions/reusable-workflows/.github/workflows/licensed.yml@main
@@ -56,17 +55,27 @@ licensed-call:
 If the default behaviour of a reusable workflow isn't what you need, you can adjust it using the workflow's inputs.
 Check the available inputs of reusable workflows in the corresponding YAML file in `.github/workflows/<reusable-workflow-name>.yml`.
 
-Example of disabling audit of npm packages in the `basic-validation` workflow:
+Example of disabling auditing of NPM packages in the `basic-validation` workflow:
 ```yaml
 basic-validation-call:
   uses: actions/reusable-workflows/.github/workflows/basic-validation.yml@main
   with:
     enable-audit: false
 ```
+
 ## License
 
 The scripts and documentation in this project are released under the [MIT License](LICENSE.txt)
 
-## Contributions
+## Contributing
 
 Contributions are welcome! See [Contributor's Guide](CONTRIBUTING.md)
+
+## Maintainers 
+
+See [CODEOWNERS](./CODEOWNERS).
+
+## Support
+
+See [SUPPORT.md](./SUPPORT.md).
+
