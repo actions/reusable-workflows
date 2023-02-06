@@ -1,0 +1,98 @@
+# This workflow helps to keep configuration files for such tools as ESLint and Prettier in your repo up to date with the reference configuration files from the actions/reusable-workflows repository.
+# Once the reference configuration files are changed in the https://github.com/actions/reusable-workflows/tree/main/reusable-configurations, the workflow will automatically create PR with updates in your repo.
+
+name: Update configuration files
+
+on:
+  workflow_call:
+    inputs:
+        base-pr-branch:
+          description: "Optional input to specify the branch where PR changes should be integrated."
+          required: false
+          type: string
+          default: "main"
+        head-pr-branch:
+          description: "Optional input to specify the branch where PR changes should be made."
+          required: false
+          type: string
+          default: "tool-config-auto-update"
+        target-folder:
+          description: "Optional input to set a relative path to a folder where updated configuration files should be placed."
+          required: false
+          type: string
+          default: "./"
+        reference-files:
+          description: "Optional input to specify which files should be used as references. Files can be supplied in comma-separated format, wildcards are supported."
+          required: false
+          type: string
+          default: "*"
+
+jobs:
+  update-configuration-files:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - name: Checkout ${{github.repository}} repository
+      uses: actions/checkout@v3
+      with:
+        ref: '${{inputs.base-pr-branch}}'
+        path: 'current'
+        
+    - name: Checkout actions/reusable-workflows repository
+      uses: actions/checkout@v3
+      with:
+        repository: 'akv-platform/reusable-workflows' #TODO change to real link
+        ref: 'update-tool-configs' #TODO remove line
+        path: 'example'
+
+    - name: Configure git service account
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+    - name: Update configuration files
+      run: |
+        cd "${{github.workspace}}/current"
+        
+        if [ ! -d "${{inputs.target-folder}}" ]; then
+          echo "::error::Directory: '${{inputs.target-folder}}' supplied to the 'target-folder' input does not exist in the ${{github.repository}} repository on the branch: ${{inputs.base-pr-branch}}."
+          exit 1
+        fi
+
+        git checkout -b ${{inputs.head-pr-branch}}
+
+        filePatterns="${{inputs.reference-files}}"
+        mapfile -td ',' arrOfFilePatterns < <(echo -n "${filePatterns//, /,}")
+
+        for filePattern in "${arrOfFilePatterns[@]}"; do
+          if [ "$(find ${{github.workspace}}/example/reusable-configurations -name "$filePattern")" ]; then
+            rsync -a --include="$filePattern" --exclude="*" ${{github.workspace}}/example/reusable-configurations/ ${{github.workspace}}/current/${{inputs.target-folder}}
+          else
+            echo "::warning::Files corresponding to the specified file pattern: '$filePattern' do not exist in the reference https://github.com/actions/reusable-workflows/tree/main/reusable-configurations folder."
+          fi
+        done
+
+    - name: Create commit and push changes to ${{github.repository}}
+      id: successful-commit
+      run: |
+        cd "${{github.workspace}}/current"
+
+        if [ "$(git diff --ignore-space-at-eol ${{github.workspace}}/current/${{inputs.target-folder}} | wc -l)" -gt "0" ]; then
+          git add .
+          git commit -m "Update configuration files"
+          git push origin ${{inputs.head-pr-branch}} -f
+          echo "STATUS=true" >> $GITHUB_OUTPUT
+        else
+          echo "::notice::Configuration files are up to date with the reference files from https://github.com/actions/reusable-workflows/tree/main/reusable-configurations folder."
+          echo "STATUS=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create pull request
+      if: ${{ steps.successful-commit.outputs.STATUS == 'true' }}
+      run: |
+         curl \
+          -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{github.token}}"\
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          https://api.github.com/repos/${{github.repository}}/pulls \
+          -d '{"title":"'"Automatic update of configuration files from $(date +'%m/%d/%Y')"'","body":"In the scope of this PR, configuration files should be updated to match examples stored in the '"[reusable-workflows](https://github.com/actions/reusable-workflows/tree/main/reusable-configurations)"' repository.","head":"${{inputs.head-pr-branch}}","base":"${{inputs.base-pr-branch}}"}'
