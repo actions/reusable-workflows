@@ -67,7 +67,8 @@ jobs:
           if [ "$(find ${{github.workspace}}/example/reusable-configurations -name "$filePattern")" ]; then
             rsync -a --include="$filePattern" --exclude="*" ${{github.workspace}}/example/reusable-configurations/ ${{github.workspace}}/current/${{inputs.target-folder}}
           else
-            echo "::warning::Files corresponding to the specified file pattern: '$filePattern' do not exist in the reference https://github.com/actions/reusable-workflows/tree/main/reusable-configurations folder."
+            echo "::error::Files corresponding to the specified file pattern: '$filePattern' do not exist in the reference https://github.com/actions/reusable-workflows/tree/main/reusable-configurations folder."
+            exit 1
           fi
         done
 
