@@ -35,14 +35,14 @@ jobs:
       uses: actions/checkout@v3
       with:
         ref: '${{inputs.base-pr-branch}}'
-        path: 'current'
+        path: 'target'
         
     - name: Checkout actions/reusable-workflows repository
       uses: actions/checkout@v3
       with:
         repository: 'akv-platform/reusable-workflows' #TODO change to real link
         ref: 'update-tool-configs' #TODO remove line
-        path: 'example'
+        path: 'source'
 
     - name: Configure git service account
       run: |
@@ -50,9 +50,8 @@ jobs:
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
     - name: Update configuration files
+      working-directory: ./target
       run: |
-        cd "${{github.workspace}}/current"
-        
         if [ ! -d "${{inputs.target-folder}}" ]; then
           echo "::error::Directory: '${{inputs.target-folder}}' supplied to the 'target-folder' input does not exist in the ${{github.repository}} repository on the branch: ${{inputs.base-pr-branch}}."
           exit 1
@@ -64,8 +63,8 @@ jobs:
         mapfile -td ',' arrOfFilePatterns < <(echo -n "${filePatterns//, /,}")
 
         for filePattern in "${arrOfFilePatterns[@]}"; do
-          if [ "$(find ${{github.workspace}}/example/reusable-configurations -name "$filePattern")" ]; then
-            rsync -a --include="$filePattern" --exclude="*" ${{github.workspace}}/example/reusable-configurations/ ${{github.workspace}}/current/${{inputs.target-folder}}
+          if [ "$(find ${{github.workspace}}/source/reusable-configurations -name "$filePattern")" ]; then
+            rsync -a --include="$filePattern" --exclude="*" ${{github.workspace}}/source/reusable-configurations/ ${{github.workspace}}/target/${{inputs.target-folder}}
           else
             echo "::error::Files corresponding to the specified file pattern: '$filePattern' do not exist in the reference https://github.com/actions/reusable-workflows/tree/main/reusable-configurations folder."
             exit 1
@@ -73,11 +72,12 @@ jobs:
         done
 
     - name: Create commit and push changes to ${{github.repository}}
-      id: successful-commit
+      working-directory: ./target
+      id: successful-update
       run: |
-        cd "${{github.workspace}}/current"
+        cd "${{github.workspace}}/target"
 
-        if [ "$(git diff --ignore-space-at-eol ${{github.workspace}}/current/${{inputs.target-folder}} | wc -l)" -gt "0" ]; then
+        if [ "$(git diff --ignore-space-at-eol ${{github.workspace}}/target/${{inputs.target-folder}} | wc -l)" -gt "0" ]; then
           git add .
           git commit -m "Update configuration files"
           git push origin ${{inputs.head-pr-branch}} -f
@@ -88,7 +88,7 @@ jobs:
         fi
 
     - name: Create pull request
-      if: ${{ steps.successful-commit.outputs.STATUS == 'true' }}
+      if: ${{ steps.successful-update.outputs.STATUS == 'true' }}
       run: |
          curl \
           -X POST \
