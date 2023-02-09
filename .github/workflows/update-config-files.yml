@@ -75,8 +75,6 @@ jobs:
       working-directory: ./target
       id: successful-update
       run: |
-        cd "${{github.workspace}}/target"
-
         if [ "$(git diff --ignore-space-at-eol ${{github.workspace}}/target/${{inputs.target-folder}} | wc -l)" -gt "0" ]; then
           git add .
           git commit -m "Update configuration files"
