@@ -9,6 +9,10 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint', 'eslint-plugin-jest'],
   rules: {
+    '@typescript-eslint/no-require-imports': 'error',
+    '@typescript-eslint/prefer-readonly': 'error',
+    '@typescript-eslint/no-useless-constructor': 'error',
+    '@typescript-eslint/promise-function-async': 'error',
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/ban-ts-comment': [
@@ -17,6 +21,9 @@ module.exports = {
         'ts-ignore': 'allow-with-description'
       }
     ],
+    'no-console': 'error',
+    'yoda': 'error',
+    'no-magic-numbers': 'error',
     'prefer-const': [
       'error',
       {
@@ -33,7 +40,8 @@ module.exports = {
         '@typescript-eslint/no-unused-vars': 'off',
         '@typescript-eslint/no-empty-function': 'off',
         'jest/no-standalone-expect': 'off',
-        'jest/no-conditional-expect': 'off'
+        'jest/no-conditional-expect': 'off',
+        'no-magic-numbers': 'off',
       }
     }
   ],
