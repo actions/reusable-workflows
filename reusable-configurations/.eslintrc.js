@@ -37,7 +37,8 @@ module.exports = {
         '@typescript-eslint/no-empty-function': 'off',
         'jest/no-standalone-expect': 'off',
         'jest/no-conditional-expect': 'off',
-        'no-magic-numbers': 'off',
+        'no-console': 'off',
+
       }
     }
   ],
