@@ -10,8 +10,6 @@ module.exports = {
   plugins: ['@typescript-eslint', 'eslint-plugin-jest'],
   rules: {
     '@typescript-eslint/no-require-imports': 'error',
-    '@typescript-eslint/prefer-readonly': 'error',
-    '@typescript-eslint/promise-function-async': 'error',
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/ban-ts-comment': [
@@ -22,7 +20,6 @@ module.exports = {
     ],
     'no-console': 'error',
     'yoda': 'error',
-    'no-magic-numbers': 'error',
     'prefer-const': [
       'error',
       {
