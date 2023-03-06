@@ -45,7 +45,7 @@ jobs:
 
       - name: Compare the expected and actual dist directories
         run: |
-          if [ "$(git diff --ignore-space-at-eol ${{inputs.folder-path}} | wc -l)" -gt "0" ]; then
+          if [ "$(git diff --ignore-space-at-eol ${{inputs.dist-path}} | wc -l)" -gt "0" ]; then
             echo "Detected uncommitted changes after the build. See the status below:"
             git diff
             exit 1
