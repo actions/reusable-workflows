@@ -40,8 +40,8 @@ jobs:
       - name: Checkout actions/reusable-workflows repository
         uses: actions/checkout@v3
         with:
-          repository: "akv-platform/reusable-workflows" #TODO change to real link
-          ref: "update-tool-configs" #TODO remove line
+          repository: "actions/reusable-workflows"
+          ref: "main"
           path: "source"
 
       - name: Configure git service account
