@@ -46,9 +46,21 @@ codeql-analysis-call:
 
 This workflow helps to check the statuses of cached dependencies used in action with the help of the Licensed tool.
 
+**Usage**
 ```yaml
 licensed-call:
   uses: actions/reusable-workflows/.github/workflows/licensed.yml@main
+```
+
+- [`update-config-files.yml`](./.github/workflows/update-config-files.yml)
+
+This workflow helps to keep configuration files for such tools as ESLint and Prettier up to date with the reference configuration files from the [actions/reusable-workflows](https://github.com/actions/reusable-workflows) repository.
+Once the reference configuration files are changed in the [reference folder](https://github.com/actions/reusable-workflows/tree/main/reusable-configurations), the workflow will automatically create PR with updates in the repo where it's launched.
+
+**Usage**
+```yaml
+update-config-files-call:
+  uses: actions/reusable-workflows/.github/workflows/update-config-files.yml@main
 ```
 ## Adjusting reusable workflows
 

@@ -1,0 +1,167 @@
+# This workflow helps to keep configuration files for such tools as ESLint and Prettier in your repo up to date with the reference configuration files from the actions/reusable-workflows repository.
+# Once the reference configuration files are changed in the https://github.com/actions/reusable-workflows/tree/main/reusable-configurations, the workflow will automatically create PR with updates in your repo.
+
+name: Update configuration files
+
+on:
+  workflow_call:
+    inputs:
+      base-pr-branch:
+        description: "Optional input to specify the branch where PR changes should be integrated."
+        required: false
+        type: string
+        default: "main"
+      head-pr-branch:
+        description: "Optional input to specify the branch where PR changes should be made."
+        required: false
+        type: string
+        default: "tool-config-auto-update"
+      target-folder:
+        description: "Optional input to set a relative path to a folder where updated configuration files should be placed."
+        required: false
+        type: string
+        default: "./"
+      reference-files:
+        description: "Optional input to specify which files should be used as references. Files can be supplied in comma-separated format, wildcards are supported."
+        required: false
+        type: string
+        default: "*"
+
+jobs:
+  update-configuration-files:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Checkout ${{github.repository}} repository
+        uses: actions/checkout@v3
+        with:
+          ref: "${{inputs.base-pr-branch}}"
+          path: "target"
+
+      - name: Checkout actions/reusable-workflows repository
+        uses: actions/checkout@v3
+        with:
+          repository: "actions/reusable-workflows"
+          ref: "main"
+          path: "source"
+
+      - name: Configure git service account
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Update configuration files
+        working-directory: ./target
+        id: successful-update
+        run: |
+          if [ ! -d "${{inputs.target-folder}}" ]; then
+            echo "::error::Directory: '${{inputs.target-folder}}' supplied to the 'target-folder' input does not exist in the ${{github.repository}} repository on the branch: ${{inputs.base-pr-branch}}."
+            exit 1
+          fi
+
+          git checkout -b ${{inputs.head-pr-branch}}
+
+          filePatterns="${{inputs.reference-files}}"
+          mapfile -td ',' arrOfFilePatterns < <(echo -n "${filePatterns//, /,}")
+
+          for filePattern in "${arrOfFilePatterns[@]}"; do
+            if [ "$(find ${{github.workspace}}/source/reusable-configurations -name "$filePattern")" ]; then
+              rsync -a --include="$filePattern" --exclude="*" ${{github.workspace}}/source/reusable-configurations/ ${{github.workspace}}/target/${{inputs.target-folder}}
+            else
+              echo "::error::Files corresponding to the specified file pattern: '$filePattern' do not exist in the reference https://github.com/actions/reusable-workflows/tree/main/reusable-configurations folder."
+              exit 1
+            fi
+          done
+
+          git add .
+
+          if [ "$(git diff --ignore-space-at-eol --staged ${{github.workspace}}/target/${{inputs.target-folder}} | wc -l)" -gt "0" ]; then
+            echo "Configuration files update is successful."
+            echo "STATUS=true" >> $GITHUB_OUTPUT
+          else
+            echo "::notice::Referenced configuration files are up to date with the files from https://github.com/actions/reusable-workflows/tree/main/reusable-configurations folder."
+            echo "STATUS=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install Node.js
+        if: ${{ steps.successful-update.outputs.STATUS == 'true' }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        if: ${{ steps.successful-update.outputs.STATUS == 'true' }}
+        working-directory: ./target
+        continue-on-error: true
+        run: npm ci
+
+      - name: Automatically apply the updated configuration files
+        if: ${{ steps.successful-update.outputs.STATUS == 'true' }}
+        working-directory: ./target
+        id: automatic-apply
+        continue-on-error: true
+        run: |
+          npm run format; npm run lint:fix
+
+      - name: Create commit and push changes to ${{github.repository}}
+        if: ${{ steps.successful-update.outputs.STATUS == 'true' }}
+        working-directory: ./target
+        run: |
+          git add .
+          git commit -m "Update configuration files"
+          git push origin ${{inputs.head-pr-branch}} -f
+
+      - name: Check PR existence
+        if: ${{ steps.successful-update.outputs.STATUS == 'true' }}
+        id: pr-existence
+        run: |
+          response=$(curl \
+            --no-progress-meter \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{github.token}}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/${{github.repository}}/pulls?head=${{github.repository_owner}}:${{inputs.head-pr-branch}}&base=${{inputs.base-pr-branch}})
+
+          if [ "$( echo "$response" | jq length)" != "0" ]; then
+            prNumber=$( echo "$response" | jq -r '.[0].number' )
+            echo "STATUS=true" >> $GITHUB_OUTPUT
+            echo "PR_NUMBER=$prNumber" >> $GITHUB_OUTPUT
+            echo "Existed PR №$prNumber with configuration files update is found in the ${{github.repository}} repository."
+          else
+            echo "STATUS=false" >> $GITHUB_OUTPUT
+            echo "Existed PR with configuration files update is not found in the ${{github.repository}} repository."
+          fi
+
+      - name: Create/update pull request
+        if: ${{ steps.successful-update.outputs.STATUS == 'true' }}
+        run: |
+          if [ "${{ steps.automatic-apply.outcome }}" == "success" ]; then
+            bodyText=$'In the scope of this PR, configuration files should be updated to match examples stored in the '"[reusable-workflows](https://github.com/actions/reusable-workflows/tree/main/reusable-configurations)"' repository. The updated configuration files are applied to the repository files automatically.'
+          else
+            bodyText=$'In the scope of this PR, configuration files should be updated to match examples stored in the '"[reusable-workflows](https://github.com/actions/reusable-workflows/tree/main/reusable-configurations)"' repository.\n>**Warning**\n> The updated configuration files can not be applied to the repository automatically. Please apply the updated configuration files to the repository manually.'
+          fi
+
+          if [ "${{ steps.pr-existence.outputs.STATUS }}" == "true" ]; then
+            echo "::group::GitHub API response"
+              curl \
+              --no-progress-meter \
+              -X PATCH \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${{github.token}}" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              https://api.github.com/repos/${{github.repository}}/pulls/${{ steps.pr-existence.outputs.PR_NUMBER }} \
+              -d '{"title":"'"Automatic update of configuration files from $(date +'%m/%d/%Y')"'","body":"'"$bodyText"'","state":"open","base":"${{inputs.base-pr-branch}}"}'
+              echo "::endgroup::"
+            echo "PR №${{ steps.pr-existence.outputs.PR_NUMBER }} in the ${{ github.repository }} repository is successfully updated."
+          else
+            echo "::group::GitHub API response"
+              curl \
+              --no-progress-meter \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${{github.token}}" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              https://api.github.com/repos/${{github.repository}}/pulls \
+              -d '{"title":"'"Automatic update of configuration files from $(date +'%m/%d/%Y')"'","body":"'"$bodyText"'","head":"${{inputs.head-pr-branch}}","base":"${{inputs.base-pr-branch}}"}'
+            echo "::endgroup::"
+            echo "PR is successfully created in the ${{ github.repository }} repository"
+          fi
