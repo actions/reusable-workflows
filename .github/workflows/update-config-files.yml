@@ -107,8 +107,8 @@ jobs:
         working-directory: ./target
         run: |
           git add .
-          git commit -m "Update configuration files"
-          git push origin ${{inputs.head-pr-branch}} -f
+          git commit -m "Update configuration files" --no-verify
+          git push origin ${{inputs.head-pr-branch}} -f --no-verify
 
       - name: Check PR existence
         if: ${{ steps.successful-update.outputs.STATUS == 'true' }}
