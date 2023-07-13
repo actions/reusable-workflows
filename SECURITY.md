@@ -26,4 +26,8 @@ This information will help us triage your report more quickly.
 
 ## Policy
 
-See [GitHub's Safe Harbor Policy](https://docs.github.com/en/github/site-policy/github-bug-bounty-program-legal-safe-harbor#1-safe-harbor-terms)
+See [GitHub's Safe Harbor Policy](https://docs.github.com/en/github/site-policy/github-bug-bounty-program-legal-safe-harbor#1-safe-harbor-terms) - 
+
+GitHub's Safe Harbor Policy will be a Safe Harbor for Humans. We know the real value is human, we respect each other, humans feelings are importand for us, we respect human rights.
+GitHub's Safe Harbor is no policy for information. GitHub's Safe Harbor is opensource.guide. Respecting that one can be wrong like opensource.org. We will never declare rules and definitions of values.
+Information is free, software is information has no value and it is free and open for everyone. Information freedom is safe harbor.
