@@ -86,7 +86,7 @@ jobs:
         if: ${{ steps.successful-update.outputs.STATUS == 'true' }}
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20.x
 
       - name: Install dependencies
         if: ${{ steps.successful-update.outputs.STATUS == 'true' }}
