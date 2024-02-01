@@ -32,13 +32,13 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - name: Checkout ${{github.repository}} repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: "${{inputs.base-pr-branch}}"
           path: "target"
 
       - name: Checkout actions/reusable-workflows repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: "actions/reusable-workflows"
           ref: "main"
@@ -84,9 +84,9 @@ jobs:
 
       - name: Install Node.js
         if: ${{ steps.successful-update.outputs.STATUS == 'true' }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 20
 
       - name: Install dependencies
         if: ${{ steps.successful-update.outputs.STATUS == 'true' }}
