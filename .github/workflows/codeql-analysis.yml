@@ -11,7 +11,7 @@ on:
         description: "Optional input to set languages for CodeQL check. Supported values are: 'cpp', 'csharp', 'go', 'java', 'javascript', 'typescript', 'python', 'ruby'. To set multiple languages, use the same syntax as you can see in the default value."
         required: false
         type: string
-        default: "['javascript']"
+        default: '["javascript"]'
       codeql-cfg-path:
         description: "Optional input to set path to a CodeQL config file"
         required: false
