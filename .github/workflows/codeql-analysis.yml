@@ -11,7 +11,7 @@ on:
         description: "Optional input to set languages for CodeQL check. Supported values are: 'cpp', 'csharp', 'go', 'java', 'javascript', 'typescript', 'python', 'ruby'. To set multiple languages, use the same syntax as you can see in the default value."
         required: false
         type: string
-        default: "['javascript']"
+        default: '["javascript"]'
       codeql-cfg-path:
         description: "Optional input to set path to a CodeQL config file"
         required: false
@@ -41,7 +41,7 @@ jobs:
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       with:
         languages: ${{matrix.language}}
         config-file: ${{inputs.codeql-cfg-path}}
@@ -50,7 +50,7 @@ jobs:
     # If this step fails, configure a build command manually using build-command input. This command will be executed in the corresponding step.
     - name: Autobuild
       if: ${{!inputs.build-command}}
-      uses: github/codeql-action/autobuild@v2
+      uses: github/codeql-action/autobuild@v3
 
     - name: Manual build
       if: ${{inputs.build-command}}
@@ -58,4 +58,4 @@ jobs:
         ${{inputs.build-command}}
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@v3
