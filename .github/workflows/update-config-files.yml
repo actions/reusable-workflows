@@ -32,13 +32,13 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - name: Checkout ${{github.repository}} repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: "${{inputs.base-pr-branch}}"
           path: "target"
 
       - name: Checkout actions/reusable-workflows repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: "actions/reusable-workflows"
           ref: "main"
