@@ -8,8 +8,8 @@ import globals from 'globals';
 
 export default [
   {
-    ignores: ['**/node_modules/**', '**/lib/**', '**/dist/**', 'docs/**', '*.js', '*.mjs', '*.cjs']
-  },
+    ignores: ['**/node_modules/**', '**/lib/**', '**/dist/**', 'docs/**']
+  }
   js.configs.recommended,
   {
     files: ['**/*.ts'],
