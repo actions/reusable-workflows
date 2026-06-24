@@ -50,6 +50,7 @@ export default [
       'no-control-regex': 'off',
       'no-constant-condition': ['error', {checkLoops: false}],
       'no-useless-assignment': 'off',
+      'no-unassigned-vars': 'off',
       'n/no-extraneous-import': 'error'
     }
   },
