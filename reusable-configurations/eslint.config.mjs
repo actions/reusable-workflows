@@ -49,6 +49,7 @@ export default [
       ],
       'no-control-regex': 'off',
       'no-constant-condition': ['error', {checkLoops: false}],
+      'no-useless-assignment': 'off',
       'n/no-extraneous-import': 'error'
     }
   },
