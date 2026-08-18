@@ -62,6 +62,8 @@ jobs:
 
     - name: Test
       run: npm test
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
 
     - name: Audit packages
       run: npm audit --audit-level=high
