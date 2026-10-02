@@ -50,7 +50,7 @@ jobs:
     # If this step fails, configure a build command manually using build-command input. This command will be executed in the corresponding step.
     - name: Autobuild
       if: ${{!inputs.build-command}}
-      uses: github/codeql-action/autobuild@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
+      uses: github/codeql-action/autobuild@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
 
     - name: Manual build
       if: ${{inputs.build-command}}
