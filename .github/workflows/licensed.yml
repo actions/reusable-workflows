@@ -8,7 +8,7 @@ on:
 
 jobs:
   validate-cached-dependency-records:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: Check licenses
     steps:
 
