@@ -19,7 +19,7 @@ jobs:
         run: npm ci --ignore-scripts
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@003a5c4d8d6321bd302e38f6f0ec593f77f06600 # v1.319.0
+        uses: ruby/setup-ruby@e81a8fa391b11a595c1b7ed84177cc0fe02faf83 # v1.328.0
         with:
           ruby-version: '3.4'
 
