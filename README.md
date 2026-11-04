@@ -31,6 +31,61 @@ check-dist-call:
   uses: actions/reusable-workflows/.github/workflows/check-dist.yml@main
 ```
 
+- [`dependabot-rebuild-dist.yml`](./.github/workflows/dependabot-rebuild-dist.yml)
+
+This opt-in workflow rebuilds generated files for an eligible Dependabot pull request and commits only the configured generated directory back to the PR branch. The unprivileged build job has no publishing PAT. A separate publishing job validates the artifact paths and file types, then stages only the generated directory, including additions and deletions. If the generated output is unchanged, it makes no commit. The existing `check-dist.yml` remains read-only and should still be used for independent validation.
+
+**Caller setup**
+
+Configure a fine-grained PAT as a **Dependabot secret** named `DEPENDABOT_BUILD_TOKEN` in the caller repository (or an organization Dependabot secret available to it). Grant it Contents read and write access to that repository. Dependabot-triggered workflows do not necessarily receive regular Actions secrets. The reusable workflow requires its `token` secret, supplied by the caller as shown below; an empty or unavailable PAT fails clearly in the publishing job before it checks the PR or attempts a push. The PAT is not passed to validation or build jobs; do not use `secrets: inherit`.
+
+Call it from a trusted caller workflow, restricted to Dependabot PRs from the same repository. Pin the reusable workflow to a reviewed full commit SHA when using it in production:
+
+```yaml
+name: Rebuild Dependabot dist
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: dependabot-rebuild-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  rebuild:
+    if: >-
+      github.actor == 'dependabot[bot]' &&
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    uses: actions/reusable-workflows/.github/workflows/dependabot-rebuild-dist.yml@<reviewed-commit-sha>
+    with:
+      node-version: '24.x'
+      dist-path: 'dist'
+      # Optional overrides; these commands run only in the unprivileged build job.
+      install-command: 'npm ci --ignore-scripts'
+      build-command: 'npm run build'
+    secrets:
+      token: ${{ secrets.DEPENDABOT_BUILD_TOKEN }}
+```
+
+The example uses the `pull_request` trigger and npm manifest path filters; adjust those paths for your project. Defaults are `install-command: npm ci --ignore-scripts`, `build-command: npm run build`, `node-version: 24.x`, and `dist-path: dist`. `dist-path` must be a safe repository-relative path outside Git metadata; absolute paths, traversal components, and symbolic links in the generated output are rejected. Use `install-command` and `build-command` to override the commands independently. Both commands must be trusted caller configuration, never values taken from PR titles, comments, branch names, or other event-controlled data. The workflow only sets up Node.js; callers using pnpm, Yarn, or another package manager must ensure it is available in the build job (for example, by enabling or installing it in `install-command`).
+
+The workflow checks that the PR still has the built head SHA before publishing and never force-pushes or retries generated output against a newer head. It creates a separate commit and uses a normal Git push; if Git rejects a non-fast-forward push because the branch advanced, the workflow reports the failure and requires a fresh run. The head can still advance between the final GitHub API check and the push, so these checks do not make publication atomic or eliminate every race.
+
+**Dependabot updates and PR checks**
+
+The generated commit message includes `[dependabot skip]` to allow Dependabot to rebase and force-push over the generated commit, as described in [GitHub's documentation](https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/manage-your-dependency-security/manage-dependabot-prs#allowing-dependabot-to-rebase-and-force-push-over-extra-commits). Rebase scheduling is managed by Dependabot and the caller repository's Dependabot configuration, not by this workflow. A Dependabot refresh can replace the generated commit; the caller must handle `synchronize` events so generated output is rebuilt for the refreshed PR head.
+
+The PAT push is intended to trigger the caller repository's normal PR checks; confirm those checks run under your repository's branch protection and workflow trigger configuration. The caller's actor condition prevents the PAT-generated update from starting another rebuild.
+
 - [`codeql-analysis.yml`](./.github/workflows/codeql-analysis.yml)
 
 This workflow uses [GitHub's code scanning feature](https://docs.github.com/en/code-security/code-scanning) to analyze a repository for vulnerabilities, bugs, and other errors. 
